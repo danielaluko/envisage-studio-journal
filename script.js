@@ -77,7 +77,12 @@ if (gallery && track) {
       if (max > 0 && track.scrollLeft >= max - 2) return slides.length - 1;
       return slides.reduce((best,s,i) => Math.abs(s.offsetLeft-slides[0].offsetLeft-track.scrollLeft) < Math.abs(slides[best].offsetLeft-slides[0].offsetLeft-track.scrollLeft) ? i : best,0);
     };
-    const move = dir => {const i=activeIndex();slides[(i+dir+slides.length)%slides.length].scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest',inline:'start'});};
+    const move = dir => {
+      const max = track.scrollWidth - track.clientWidth;
+      const step = slides.length > 1 ? slides[1].offsetLeft - slides[0].offsetLeft : track.clientWidth;
+      const left = dir > 0 ? (track.scrollLeft >= max - 2 ? 0 : Math.min(max, track.scrollLeft + step)) : (track.scrollLeft <= 2 ? max : Math.max(0, track.scrollLeft - step));
+      track.scrollTo({left, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    };
     gallery.querySelector('.design-prev').addEventListener('click',()=>move(-1));
     gallery.querySelector('.design-next').addEventListener('click',()=>move(1));
     track.addEventListener('scroll',()=>{if(count)count.textContent=String(activeIndex()+1).padStart(2,'0')+' / 04';},{passive:true});
