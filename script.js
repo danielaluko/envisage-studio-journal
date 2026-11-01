@@ -72,7 +72,11 @@ if (gallery && track) {
     if (!results.every(Boolean)) return;
     gallery.hidden = false;
     const count = document.getElementById('design-count');
-    const activeIndex = () => slides.reduce((best,s,i) => Math.abs(s.offsetLeft-track.scrollLeft) < Math.abs(slides[best].offsetLeft-track.scrollLeft) ? i : best,0);
+    const activeIndex = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      if (max > 0 && track.scrollLeft >= max - 2) return slides.length - 1;
+      return slides.reduce((best,s,i) => Math.abs(s.offsetLeft-slides[0].offsetLeft-track.scrollLeft) < Math.abs(slides[best].offsetLeft-slides[0].offsetLeft-track.scrollLeft) ? i : best,0);
+    };
     const move = dir => {const i=activeIndex();slides[(i+dir+slides.length)%slides.length].scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest',inline:'start'});};
     gallery.querySelector('.design-prev').addEventListener('click',()=>move(-1));
     gallery.querySelector('.design-next').addEventListener('click',()=>move(1));
