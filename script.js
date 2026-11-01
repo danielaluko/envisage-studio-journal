@@ -79,3 +79,14 @@ if (gallery && track) {
     track.addEventListener('scroll',()=>{if(count)count.textContent=String(activeIndex()+1).padStart(2,'0')+' / 04';},{passive:true});
   });
 }
+
+// Keep the new visual showcase off-screen until every real image file is deployed.
+const showcase = document.getElementById('studio-showcase');
+if (showcase) {
+ const images = [...showcase.querySelectorAll('.showcase-grid img')];
+ Promise.all(images.map(img => new Promise(resolve => {
+   if (img.complete) return resolve(img.naturalWidth > 0);
+   img.addEventListener('load', () => resolve(true), {once:true});
+   img.addEventListener('error', () => resolve(false), {once:true});
+ }))).then(results => { if(results.every(Boolean)) showcase.hidden = false; });
+}
